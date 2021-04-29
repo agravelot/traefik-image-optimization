@@ -1,7 +1,7 @@
 displayName: Demo Plugin
 type: middleware
 
-import: github.com/traefik/plugindemo
+import: github.com/agravelot/plugindemo
 
 summary: '[Demo] Add Request Header'
 

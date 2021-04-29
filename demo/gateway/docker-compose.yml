@@ -1,0 +1,90 @@
+version: "3.3"
+
+services:
+  gateway:
+    image: traefik:2.4
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.network=traefik-net"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--entrypoints.web.address=:80"
+      - "--pilot.token=${PILOT_TOKEN}"
+      - "--metrics=true"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.buckets=0.100000, 0.300000, 1.200000, 5.000000"
+      - "--entryPoints.metrics.address=:8082"
+      - "--metrics.prometheus.entryPoint=metrics"
+      - "--experimental.devPlugin.goPath=/plugins"
+      - "--experimental.devPlugin.moduleName=github.com/agravelot/plugindemo"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/home/agravelot/Lab/traefik-image-optimization:/plugins/src/github.com/agravelot/plugindemo:rw,delegated"
+      # - "./gateway/traefik.yml:/etc/traefik/traefik.yml:ro,delegated"
+      - "letsencrypt:/letsencrypt:rw,delegated"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - metrics
+      - traefik-net
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
+      # - "traefik.http.routers.prometheus.service=prometheus"
+      # - "traefik.http.routers.prometheus.entrypoints=web"
+            # - "traefik.http.routers.prometheus.service=prometheus"
+    #  - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+    #  - "traefik.docker.network=inbound"
+    networks:
+      - metrics
+      - traefik-net
+
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      GF_LOG_LEVEL: 'debug'
+    env_file:
+      - ./grafana/config.monitoring
+    user: "104"
+    networks:
+      - metrics
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.localhost`)"
+      # - "traefik.http.routers.grafana.service=grafana"
+      # - "traefik.http.routers.grafana.entrypoints=web"
+      # - "traefik.http.routers.grafana.service=grafana"
+      # - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      # - "traefik.docker.network=inbound"
+
+volumes:
+  letsencrypt:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  metrics:
+  traefik-net:
+    external: 
+      name: traefik-net
