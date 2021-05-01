@@ -2,6 +2,7 @@ package image_optimizer
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -9,8 +10,14 @@ import (
 	"github.com/agravelot/image_optimizer/processor"
 )
 
+type ImaginaryConfig struct {
+	Url string `json:"url" yaml:"url" toml:"url"`
+}
+
 // Config the plugin configuration.
 type Config struct {
+	Processor string          `json:"processor" yaml:"processor" toml:"processor"`
+	Imaginary ImaginaryConfig `json:"imaginary,omitempty" yaml:"imaginary,omitempty" toml:"imaginary,omitempty"`
 }
 
 // CreateConfig creates the default plugin configuration.
@@ -20,8 +27,10 @@ func CreateConfig() *Config {
 
 // Demo a Demo plugin.
 type Demo struct {
-	next http.Handler
-	name string
+	processor string
+	imaginary ImaginaryConfig
+	next      http.Handler
+	name      string
 }
 
 // New created a new Demo plugin.
@@ -29,10 +38,16 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 
 	log.Println("Loading image optimization plugin...")
 	// TODO Init and config
+	fmt.Printf("config : %+v\n", config)
+
+	if config.Processor == "" {
+		return nil, fmt.Errorf("processor must be defined")
+	}
 
 	return &Demo{
-		next: next,
-		name: name,
+		processor: config.Processor,
+		next:      next,
+		name:      name,
 	}, nil
 }
 
@@ -58,7 +73,7 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// Delegates the Content-Length Header creation to the final body write.
 	rw.Header().Del("Content-Length")
 
-	processor, err := processor.New("imaginary")
+	processor, err := processor.New(a.processor)
 	if err != nil {
 		panic(err)
 	}

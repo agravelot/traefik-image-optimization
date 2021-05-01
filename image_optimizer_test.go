@@ -10,26 +10,58 @@ import (
 )
 
 func TestDemo(t *testing.T) {
-	cfg := image_optimizer.CreateConfig()
-
-	ctx := context.Background()
-	next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {})
-
-	handler, err := image_optimizer.New(ctx, next, cfg, "demo-plugin")
-	if err != nil {
-		t.Fatal(err)
+	type args struct {
+		config image_optimizer.Config
 	}
-
-	recorder := httptest.NewRecorder()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost", nil)
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name:    "should init with processor",
+			args:    args{config: image_optimizer.Config{Processor: "imaginary"}},
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name:    "should not init without processor",
+			args:    args{config: image_optimizer.Config{Processor: ""}},
+			want:    false,
+			wantErr: true,
+		},
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := image_optimizer.CreateConfig()
+			cfg.Processor = tt.args.config.Processor
 
-	handler.ServeHTTP(recorder, req)
+			ctx := context.Background()
+			next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {})
 
-	// TODO Assert here
+			handler, err := image_optimizer.New(ctx, next, cfg, "demo-plugin")
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("New() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if err != nil {
+				return
+			}
+
+			recorder := httptest.NewRecorder()
+
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			handler.ServeHTTP(recorder, req)
+
+			// TODO Assert here
+		})
+	}
 }
 
 func TestIsImageRequest(t *testing.T) {

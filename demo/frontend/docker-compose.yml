@@ -11,6 +11,7 @@ services:
     - "traefik.enable=true"
     - "traefik.http.routers.demo.rule=Host(`demo.localhost`)"
     - "traefik.http.middlewares.image_optimizer.plugin.dev.foo=bar"
+    - "traefik.http.middlewares.image_optimizer.plugin.dev.processor=imaginary"
     - "traefik.http.routers.demo.middlewares=image_optimizer"
 
 networks:
