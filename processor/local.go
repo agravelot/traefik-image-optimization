@@ -1,4 +1,4 @@
-package optimizer
+package processor
 
 type LocalOptimizer struct {
 }

@@ -1,10 +1,10 @@
-package optimizer_test
+package processor_test
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/agravelot/image_optimizer/optimizer"
+	"github.com/agravelot/image_optimizer/processor"
 )
 
 func TestNew(t *testing.T) {
@@ -14,19 +14,19 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    optimizer.Optimizer
+		want    processor.Optimizer
 		wantErr bool
 	}{
 		{
 			name:    "should be able to return imaginary optimizer",
 			args:    args{driver: "imaginary"},
-			want:    &optimizer.ImaginaryOptimizer{},
+			want:    &processor.ImaginaryOptimizer{},
 			wantErr: false,
 		},
 		{
 			name:    "should be able to return local optimizer",
 			args:    args{driver: "local"},
-			want:    &optimizer.LocalOptimizer{},
+			want:    &processor.LocalOptimizer{},
 			wantErr: false,
 		},
 		{
@@ -38,7 +38,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := optimizer.New(tt.args.driver)
+			got, err := processor.New(tt.args.driver)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return

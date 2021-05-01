@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/agravelot/image_optimizer/optimizer"
+	"github.com/agravelot/image_optimizer/processor"
 )
 
 // Config the plugin configuration.
@@ -58,12 +58,12 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// Delegates the Content-Length Header creation to the final body write.
 	rw.Header().Del("Content-Length")
 
-	optimizer, err := optimizer.New("imaginary")
+	processor, err := processor.New("imaginary")
 	if err != nil {
 		panic(err)
 	}
 
-	optimized, err := optimizer.Optimize(bodyBytes, "", "", 75)
+	optimized, err := processor.Optimize(bodyBytes, "", "", 75)
 	if err != nil {
 		panic(err)
 	}
