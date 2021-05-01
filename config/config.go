@@ -8,4 +8,5 @@ type ImaginaryConfig struct {
 type Config struct {
 	Processor string          `json:"processor" yaml:"processor" toml:"processor"`
 	Imaginary ImaginaryConfig `json:"imaginary,omitempty" yaml:"imaginary,omitempty" toml:"imaginary,omitempty"`
+	Cache     string          `json:"cache" yaml:"cache" toml:"cache"`
 }
