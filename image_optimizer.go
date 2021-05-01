@@ -46,6 +46,11 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 	}, nil
 }
 
+const (
+	contentLength = "Content-Length"
+	contentType   = "Cache-Type"
+)
+
 func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// Ignore non image requests
 
@@ -60,12 +65,12 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	bodyBytes := wrappedWriter.buffer.Bytes()
 
-	if !IsImageResponse(rw.Header().Get("content-type")) {
+	if !IsImageResponse(rw.Header().Get(contentType)) {
 		return
 	}
 
 	// Delegates the Content-Length Header creation to the final body write.
-	rw.Header().Del("Content-Length")
+	rw.Header().Del(contentLength)
 
 	processor, err := processor.New(a.config.Config)
 	if err != nil {
