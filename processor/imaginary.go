@@ -5,10 +5,18 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+
+	"github.com/agravelot/image_optimizer/config"
 )
 
-// TODO imaginary url = http://imaginary:9000
 type ImaginaryProcessor struct {
+	Url string
+}
+
+func NewImaginary(conf config.Config) *ImaginaryProcessor {
+	return &ImaginaryProcessor{
+		Url: conf.Imaginary.Url,
+	}
 }
 
 func (ip *ImaginaryProcessor) Optimize(media []byte, origialFormat string, targetFormat string, quality int) ([]byte, error) {

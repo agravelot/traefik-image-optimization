@@ -7,11 +7,12 @@ import (
 	"testing"
 
 	"github.com/agravelot/image_optimizer"
+	"github.com/agravelot/image_optimizer/config"
 )
 
 func TestDemo(t *testing.T) {
 	type args struct {
-		config image_optimizer.Config
+		config config.Config
 	}
 	tests := []struct {
 		name    string
@@ -21,13 +22,13 @@ func TestDemo(t *testing.T) {
 	}{
 		{
 			name:    "should init with processor",
-			args:    args{config: image_optimizer.Config{Processor: "imaginary"}},
+			args:    args{config: config.Config{Processor: "imaginary"}},
 			want:    false,
 			wantErr: false,
 		},
 		{
 			name:    "should not init without processor",
-			args:    args{config: image_optimizer.Config{Processor: ""}},
+			args:    args{config: config.Config{Processor: ""}},
 			want:    false,
 			wantErr: true,
 		},
