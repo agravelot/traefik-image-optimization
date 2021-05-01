@@ -1,6 +1,7 @@
 package image_optimizer_test
 
 import (
+	"bytes"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -15,22 +16,44 @@ func TestDemo(t *testing.T) {
 		config config.Config
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    bool
-		wantErr bool
+		name                      string
+		args                      args
+		remoteResponseContentType string
+		remoteResponseContent     []byte
+		want                      bool
+		wantErr                   bool
 	}{
 		{
-			name:    "should init with processor",
-			args:    args{config: config.Config{Processor: "imaginary"}},
-			want:    false,
-			wantErr: false,
+			name:                      "should pass with processor",
+			args:                      args{config: config.Config{Processor: "imaginary"}},
+			want:                      false,
+			wantErr:                   false,
+			remoteResponseContentType: "text/html",
+			remoteResponseContent:     []byte("dummy response"),
 		},
 		{
-			name:    "should not init without processor",
-			args:    args{config: config.Config{Processor: ""}},
-			want:    false,
-			wantErr: true,
+			name:                      "should not pass without processor",
+			args:                      args{config: config.Config{Processor: ""}},
+			want:                      false,
+			wantErr:                   true,
+			remoteResponseContentType: "text/html",
+			remoteResponseContent:     []byte("dummy response"),
+		},
+		{
+			name:                      "should pass with processor with image response",
+			args:                      args{config: config.Config{Processor: "none"}},
+			want:                      false,
+			wantErr:                   false,
+			remoteResponseContentType: "image/jpeg",
+			remoteResponseContent:     []byte("dummy image"),
+		},
+		{
+			name:                      "should return original response if not image request",
+			args:                      args{config: config.Config{Processor: "none"}},
+			want:                      false,
+			wantErr:                   false,
+			remoteResponseContentType: "text/html",
+			remoteResponseContent:     []byte("dummy response"),
 		},
 	}
 	for _, tt := range tests {
@@ -39,7 +62,10 @@ func TestDemo(t *testing.T) {
 			cfg.Processor = tt.args.config.Processor
 
 			ctx := context.Background()
-			next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {})
+			next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+				rw.Header().Add("content-type", tt.remoteResponseContentType)
+				rw.Write([]byte(tt.remoteResponseContent))
+			})
 
 			handler, err := image_optimizer.New(ctx, next, cfg, "demo-plugin")
 
@@ -60,7 +86,9 @@ func TestDemo(t *testing.T) {
 
 			handler.ServeHTTP(recorder, req)
 
-			// TODO Assert here
+			if !bytes.Equal(recorder.Body.Bytes(), tt.remoteResponseContent) {
+				t.Fatal("response are not equals")
+			}
 		})
 	}
 }

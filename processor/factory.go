@@ -11,9 +11,6 @@ type Processor interface {
 }
 
 func New(conf config.Config) (Processor, error) {
-	if conf.Processor == "local" {
-		return &LocalProcessor{}, nil
-	}
 
 	if conf.Processor == "imaginary" {
 		p, err := NewImaginary(conf)
@@ -22,6 +19,14 @@ func New(conf config.Config) (Processor, error) {
 		}
 
 		return p, nil
+	}
+
+	if conf.Processor == "local" {
+		return &LocalProcessor{}, nil
+	}
+
+	if conf.Processor == "none" {
+		return &NoneProcessor{}, nil
 	}
 
 	return nil, fmt.Errorf("unable to resolver given optimizer %s", conf.Processor)

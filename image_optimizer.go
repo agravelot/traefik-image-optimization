@@ -66,6 +66,7 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	bodyBytes := wrappedWriter.buffer.Bytes()
 
 	if !IsImageResponse(rw.Header().Get(contentType)) {
+		rw.Write(bodyBytes)
 		return
 	}
 
