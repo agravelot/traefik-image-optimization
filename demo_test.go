@@ -31,3 +31,89 @@ func TestDemo(t *testing.T) {
 
 	// TODO Assert here
 }
+
+func TestIsImageRequest(t *testing.T) {
+	type args struct {
+		acceptHeader string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name:    "should return false with empty string",
+			args:    args{acceptHeader: ""},
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name:    "should return false with standard chrome request",
+			args:    args{acceptHeader: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"},
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name:    "should return true with image chrome request",
+			args:    args{acceptHeader: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"},
+			want:    true,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := plugindemo.IsImageRequest(tt.args.acceptHeader)
+
+			if got != tt.want {
+				t.Errorf("IsImageRequest() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsImageResponse(t *testing.T) {
+	type args struct {
+		contentType string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name:    "should return false with empty string",
+			args:    args{contentType: ""},
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name:    "should return true with jpeg content type",
+			args:    args{contentType: "image/jpeg"},
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name:    "should return true with webp content type",
+			args:    args{contentType: "image/webp"},
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name:    "should return false with json content type",
+			args:    args{contentType: "application/json"},
+			want:    false,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := plugindemo.IsImageResponse(tt.args.contentType)
+
+			if got != tt.want {
+				t.Errorf("IsImageResponse() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

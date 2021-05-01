@@ -2,9 +2,9 @@ version: "3.3"
 
 services:
   gateway:
-    image: traefik:2.4
+    build: ../gateway
     command:
-      - "--log.level=DEBUG"
+      # - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.network=traefik-net"
