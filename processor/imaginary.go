@@ -47,7 +47,7 @@ func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
 
 func (ip *ImaginaryProcessor) Optimize(media []byte, origialFormat string, targetFormat string, quality int) ([]byte, error) {
 
-	url := "http://imaginary:9000/convert?type=webp&field=file"
+	url := fmt.Sprintf("%s/convert?type=webp&field=file", ip.Url)
 	method := "POST"
 
 	payload := &bytes.Buffer{}
