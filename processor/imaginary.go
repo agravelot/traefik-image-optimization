@@ -8,10 +8,10 @@ import (
 )
 
 // TODO imaginary url = http://imaginary:9000
-type ImaginaryOptimizer struct {
+type ImaginaryProcessor struct {
 }
 
-func (lo *ImaginaryOptimizer) Optimize(media []byte, origialFormat string, targetFormat string, quality int) ([]byte, error) {
+func (ip *ImaginaryProcessor) Optimize(media []byte, origialFormat string, targetFormat string, quality int) ([]byte, error) {
 
 	url := "http://imaginary:9000/convert?type=webp&field=file"
 	method := "POST"

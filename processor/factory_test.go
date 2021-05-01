@@ -14,19 +14,19 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    processor.Optimizer
+		want    processor.Processor
 		wantErr bool
 	}{
 		{
 			name:    "should be able to return imaginary optimizer",
 			args:    args{driver: "imaginary"},
-			want:    &processor.ImaginaryOptimizer{},
+			want:    &processor.ImaginaryProcessor{},
 			wantErr: false,
 		},
 		{
 			name:    "should be able to return local optimizer",
 			args:    args{driver: "local"},
-			want:    &processor.LocalOptimizer{},
+			want:    &processor.LocalProcessor{},
 			wantErr: false,
 		},
 		{
