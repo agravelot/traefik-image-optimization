@@ -10,8 +10,8 @@ services:
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.demo.rule=Host(`demo.localhost`)"
-    - "traefik.http.middlewares.plugindemo.plugin.dev.foo=bar"
-    - "traefik.http.routers.demo.middlewares=plugindemo"
+    - "traefik.http.middlewares.image_optimizer.plugin.dev.foo=bar"
+    - "traefik.http.routers.demo.middlewares=image_optimizer"
 
 networks:
   traefik-net:

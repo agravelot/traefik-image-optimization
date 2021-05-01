@@ -1,4 +1,4 @@
-package plugindemo_test
+package image_optimizer_test
 
 import (
 	"context"
@@ -6,16 +6,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/agravelot/plugindemo"
+	"github.com/agravelot/image_optimizer"
 )
 
 func TestDemo(t *testing.T) {
-	cfg := plugindemo.CreateConfig()
+	cfg := image_optimizer.CreateConfig()
 
 	ctx := context.Background()
 	next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {})
 
-	handler, err := plugindemo.New(ctx, next, cfg, "demo-plugin")
+	handler, err := image_optimizer.New(ctx, next, cfg, "demo-plugin")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestIsImageRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := plugindemo.IsImageRequest(tt.args.acceptHeader)
+			got := image_optimizer.IsImageRequest(tt.args.acceptHeader)
 
 			if got != tt.want {
 				t.Errorf("IsImageRequest() = %v, want %v", got, tt.want)
@@ -109,7 +109,7 @@ func TestIsImageResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := plugindemo.IsImageResponse(tt.args.contentType)
+			got := image_optimizer.IsImageResponse(tt.args.contentType)
 
 			if got != tt.want {
 				t.Errorf("IsImageResponse() = %v, want %v", got, tt.want)

@@ -4,7 +4,7 @@ global:
 experimental:
   devPlugin:
     goPath: /plugins
-    moduleName: plugindemo
+    moduleName: image_optimizer
 
 entryPoints:
   web:

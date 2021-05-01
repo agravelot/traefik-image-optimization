@@ -1,4 +1,4 @@
-package plugindemo
+package image_optimizer
 
 import (
 	"bufio"

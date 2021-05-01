@@ -1,5 +1,4 @@
-// Package plugindemo a demo plugin.
-package plugindemo
+package image_optimizer
 
 import (
 	"context"
@@ -7,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/agravelot/plugindemo/optimizer"
+	"github.com/agravelot/image_optimizer/optimizer"
 )
 
 // Config the plugin configuration.

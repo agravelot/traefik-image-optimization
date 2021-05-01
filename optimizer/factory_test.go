@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/agravelot/plugindemo/optimizer"
+	"github.com/agravelot/image_optimizer/optimizer"
 )
 
 func TestNew(t *testing.T) {
