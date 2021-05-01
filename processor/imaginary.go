@@ -2,9 +2,11 @@ package processor
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 
 	"github.com/agravelot/image_optimizer/config"
 )
@@ -13,10 +15,34 @@ type ImaginaryProcessor struct {
 	Url string
 }
 
-func NewImaginary(conf config.Config) *ImaginaryProcessor {
+func isValidUrl(s string) error {
+
+	if s == "" {
+		return fmt.Errorf("url cannot be empty")
+	}
+
+	u, err := url.ParseRequestURI(s)
+	if err != nil {
+		return err
+	}
+
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return fmt.Errorf("unvalid imaginary scheme")
+	}
+
+	return nil
+}
+
+func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
+
+	err := isValidUrl(conf.Imaginary.Url)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ImaginaryProcessor{
 		Url: conf.Imaginary.Url,
-	}
+	}, nil
 }
 
 func (ip *ImaginaryProcessor) Optimize(media []byte, origialFormat string, targetFormat string, quality int) ([]byte, error) {

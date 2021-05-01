@@ -16,7 +16,12 @@ func New(conf config.Config) (Processor, error) {
 	}
 
 	if conf.Processor == "imaginary" {
-		return NewImaginary(conf), nil
+		p, err := NewImaginary(conf)
+		if err != nil {
+			return nil, err
+		}
+
+		return p, nil
 	}
 
 	return nil, fmt.Errorf("unable to resolver given optimizer %s", conf.Processor)

@@ -20,9 +20,21 @@ func TestNew(t *testing.T) {
 	}{
 		{
 			name:    "should be able to return imaginary optimizer",
-			args:    args{config.Config{Processor: "imaginary"}},
+			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "http://localhost"}}},
 			want:    &processor.ImaginaryProcessor{},
 			wantErr: false,
+		},
+		{
+			name:    "should not be able to init imaginary without valid url",
+			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "htt://localhost"}}},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "should not be able to init imaginary without url",
+			args:    args{config.Config{Processor: "imaginary"}},
+			want:    nil,
+			wantErr: true,
 		},
 		{
 			name:    "should be able to return local optimizer",
@@ -47,8 +59,7 @@ func TestNew(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := processor.New(tt.args.conf)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
-				return
+				t.Fatalf("New() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			typeGot := reflect.TypeOf(got)
