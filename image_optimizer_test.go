@@ -130,7 +130,10 @@ func TestIsImageResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := image_optimizer.IsImageResponse(tt.args.contentType)
+			recorder := httptest.NewRecorder()
+			recorder.Header().Add("Content-Type", tt.args.contentType)
+
+			got := image_optimizer.IsImageResponse(recorder)
 
 			if got != tt.want {
 				t.Errorf("IsImageResponse() = %v, want %v", got, tt.want)

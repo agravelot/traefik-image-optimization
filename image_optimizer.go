@@ -65,7 +65,7 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	bodyBytes := wrappedWriter.buffer.Bytes()
 
-	if !IsImageResponse(rw.Header().Get(contentType)) {
+	if !IsImageResponse(rw) {
 		rw.Write(bodyBytes)
 		return
 	}
@@ -90,6 +90,6 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 }
 
 // IsImageResponse Determine with Content-Type header if the response is an image.
-func IsImageResponse(contentType string) bool {
-	return strings.HasPrefix(contentType, "image/")
+func IsImageResponse(rw http.ResponseWriter) bool {
+	return strings.HasPrefix(rw.Header().Get(contentType), "image/")
 }
