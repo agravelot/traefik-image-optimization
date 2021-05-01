@@ -26,6 +26,12 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name:    "should not be able to init imaginary without valid url",
+			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "localhost"}}},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "should not be able to init imaginary without valid url 2 ",
 			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "htt://localhost"}}},
 			want:    nil,
 			wantErr: true,
