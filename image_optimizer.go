@@ -48,7 +48,7 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 
 const (
 	contentLength = "Content-Length"
-	contentType   = "Cache-Type"
+	contentType   = "Content-Type"
 )
 
 func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
