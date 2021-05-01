@@ -82,7 +82,7 @@ func (ip *ImaginaryProcessor) Optimize(media []byte, origialFormat string, targe
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return body, nil
