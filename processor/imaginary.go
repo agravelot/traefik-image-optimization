@@ -12,7 +12,8 @@ import (
 )
 
 type ImaginaryProcessor struct {
-	Url string
+	Url    string
+	client http.Client
 }
 
 func isValidUrl(s string) error {
@@ -41,7 +42,8 @@ func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
 	}
 
 	return &ImaginaryProcessor{
-		Url: conf.Imaginary.Url,
+		client: http.Client{},
+		Url:    conf.Imaginary.Url,
 	}, nil
 }
 
@@ -67,14 +69,13 @@ func (ip *ImaginaryProcessor) Optimize(media []byte, origialFormat string, targe
 		return nil, err
 	}
 
-	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)
 
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
-	res, err := client.Do(req)
+	res, err := ip.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
