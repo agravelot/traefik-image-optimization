@@ -32,7 +32,7 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name:    "should not be able to init cache without valid driver",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "http://localhost"}, Cache: "unsupported"}},
+			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"}, Cache: "unsupported"}},
 			want:    nil,
 			wantErr: true,
 		},

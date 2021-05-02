@@ -20,19 +20,19 @@ func TestNew(t *testing.T) {
 	}{
 		{
 			name:    "should be able to return imaginary optimizer",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "http://localhost"}}},
+			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"}}},
 			want:    &processor.ImaginaryProcessor{},
 			wantErr: false,
 		},
 		{
 			name:    "should not be able to init imaginary without valid url",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "localhost"}}},
+			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "localhost"}}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "should not be able to init imaginary without valid url 2 ",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "htt://localhost"}}},
+			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "htt://localhost"}}},
 			want:    nil,
 			wantErr: true,
 		},
