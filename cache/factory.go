@@ -28,7 +28,10 @@ func New(conf config.Config) (Cache, error) {
 	// }
 
 	if conf.Cache == "memory" {
-		return &MemoryCache{}, nil
+		return &MemoryCache{
+			m:   map[string][]byte{},
+			mtx: sync.RWMutex{},
+		}, nil
 	}
 
 	if conf.Cache == "none" || conf.Cache == "" {
