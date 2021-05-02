@@ -20,8 +20,14 @@ func TestNew(t *testing.T) {
 	}{
 		{
 			name:    "should be able to memory cache",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "http://localhost"}, Cache: "memory"}},
+			args:    args{config.Config{Processor: "none", Cache: "memory"}},
 			want:    &cache.MemoryCache{},
+			wantErr: false,
+		},
+		{
+			name:    "should be able to memory cache",
+			args:    args{config.Config{Processor: "none", Cache: "none"}},
+			want:    &cache.NoneCache{},
 			wantErr: false,
 		},
 		{

@@ -17,6 +17,10 @@ func New(conf config.Config) (Cache, error) {
 		return &MemoryCache{}, nil
 	}
 
+	if conf.Cache == "none" {
+		return &NoneCache{}, nil
+	}
+
 	// if conf.Processor == "redis" {
 	// 	p, err := NewRedis(conf)
 	// 	if err != nil {
