@@ -66,7 +66,10 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	bodyBytes := wrappedWriter.buffer.Bytes()
 
 	if !IsImageResponse(rw) {
-		rw.Write(bodyBytes)
+		_, err = rw.Write(bodyBytes)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 
@@ -83,8 +86,10 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	if _, err := rw.Write(optimized); err != nil {
+	_, err = rw.Write(optimized)
+	if err != nil {
 		log.Printf("unable to write rewrited body: %v", err)
+		panic(err)
 	}
 
 }
