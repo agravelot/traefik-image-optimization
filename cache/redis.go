@@ -1,5 +1,7 @@
 package cache
 
+import "time"
+
 // var ctx = context.Background()
 
 type RedisCache struct {
@@ -21,7 +23,7 @@ func (c *RedisCache) Get(key string) ([]byte, error) {
 	return []byte("unsafe not supported by yaegi"), nil
 }
 
-func (c *RedisCache) Set(key string, v []byte) error {
-	// return c.client.Set(ctx, key, v, 0).Err()
+func (c *RedisCache) Set(key string, v []byte, expiry time.Duration) error {
+	// return c.client.Set(ctx, key, v, expiry).Err()
 	return nil
 }

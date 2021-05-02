@@ -3,6 +3,7 @@ package cache
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 type MemoryCache struct {
@@ -21,7 +22,8 @@ func (c *MemoryCache) Get(key string) ([]byte, error) {
 	return v, nil
 }
 
-func (c *MemoryCache) Set(key string, v []byte) error {
+// TODO Implement exipire logic
+func (c *MemoryCache) Set(key string, v []byte, _ time.Duration) error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 

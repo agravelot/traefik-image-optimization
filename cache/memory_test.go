@@ -92,7 +92,7 @@ func TestMemoryCache_Set(t *testing.T) {
 				mtx: sync.RWMutex{},
 				m:   tt.fields.m,
 			}
-			if err := c.Set(tt.args.key, tt.args.v); (err != nil) != tt.wantErr {
+			if err := c.Set(tt.args.key, tt.args.v, 0); (err != nil) != tt.wantErr {
 				t.Errorf("MemoryCache.Set() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
@@ -116,7 +116,7 @@ func BenchmarkMemoryCache_Get(b *testing.B) {
 		m:   map[string][]byte{},
 	}
 
-	_ = c.Set(testCacheKey, []byte("a good media value"))
+	_ = c.Set(testCacheKey, []byte("a good media value"), 0)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -134,13 +134,13 @@ func BenchmarkMemoryCache_SetSameKey(b *testing.B) {
 		m:   map[string][]byte{},
 	}
 
-	_ = c.Set(testCacheKey, []byte("a good media value"))
+	_ = c.Set(testCacheKey, []byte("a good media value"), 0)
 
 	b.ReportAllocs()
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_ = c.Set(testCacheKey, []byte("a good media value"))
+		_ = c.Set(testCacheKey, []byte("a good media value"), 0)
 	}
 }
 
@@ -152,12 +152,12 @@ func BenchmarkMemoryCache_SetNewKey(b *testing.B) {
 		m:   map[string][]byte{},
 	}
 
-	_ = c.Set(testCacheKey, []byte("a good media value"))
+	_ = c.Set(testCacheKey, []byte("a good media value"), 0)
 
 	b.ReportAllocs()
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_ = c.Set(fmt.Sprintf("%s-%d", testCacheKey, i), []byte("a good media value"))
+		_ = c.Set(fmt.Sprintf("%s-%d", testCacheKey, i), []byte("a good media value"), 0)
 	}
 }

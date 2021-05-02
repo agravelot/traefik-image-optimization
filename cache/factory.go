@@ -2,13 +2,14 @@ package cache
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/agravelot/image_optimizer/config"
 )
 
 type Cache interface {
 	Get(key string) ([]byte, error)
-	Set(key string, v []byte) error
+	Set(key string, val []byte, expiry time.Duration) error
 }
 
 // TODO Use singleton patern ?
