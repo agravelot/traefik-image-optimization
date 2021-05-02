@@ -1,4 +1,4 @@
-package image_optimizer_test
+package image_optimizer
 
 import (
 	"bytes"
@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/agravelot/image_optimizer"
 	"github.com/agravelot/image_optimizer/config"
 )
 
@@ -58,7 +57,7 @@ func TestDemo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg := image_optimizer.CreateConfig()
+			cfg := CreateConfig()
 			cfg.Processor = tt.args.config.Processor
 
 			ctx := context.Background()
@@ -67,7 +66,7 @@ func TestDemo(t *testing.T) {
 				rw.Write([]byte(tt.remoteResponseContent))
 			})
 
-			handler, err := image_optimizer.New(ctx, next, cfg, "demo-plugin")
+			handler, err := New(ctx, next, cfg, "demo-plugin")
 
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("New() error = %v, wantErr %v", err, tt.wantErr)
@@ -133,7 +132,7 @@ func TestIsImageResponse(t *testing.T) {
 			recorder := httptest.NewRecorder()
 			recorder.Header().Add("Content-Type", tt.args.contentType)
 
-			got := image_optimizer.IsImageResponse(recorder)
+			got := isImageResponse(recorder)
 
 			if got != tt.want {
 				t.Errorf("IsImageResponse() = %v, want %v", got, tt.want)
