@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/agravelot/image_optimizer/config"
+	"github.com/go-redis/redis/v8"
 )
 
 type Cache interface {
@@ -13,6 +14,19 @@ type Cache interface {
 
 // TODO Use singleton patern ?
 func New(conf config.Config) (Cache, error) {
+	if conf.Processor == "redis" {
+		opt, err := redis.ParseURL(conf.Redis.Url)
+		if err != nil {
+			return nil, err
+		}
+
+		client := redis.NewClient(opt)
+
+		return &RedisCache{
+			client: client,
+		}, nil
+	}
+
 	if conf.Cache == "memory" {
 		return &MemoryCache{}, nil
 	}
@@ -20,15 +34,6 @@ func New(conf config.Config) (Cache, error) {
 	if conf.Cache == "none" {
 		return &NoneCache{}, nil
 	}
-
-	// if conf.Processor == "redis" {
-	// 	p, err := NewRedis(conf)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-
-	// 	return p, nil
-	// }
 
 	return nil, fmt.Errorf("unable to resolve given cache %s", conf.Cache)
 }
