@@ -31,7 +31,7 @@ func New(conf config.Config) (Cache, error) {
 		return &MemoryCache{}, nil
 	}
 
-	if conf.Cache == "none" {
+	if conf.Cache == "none" || conf.Cache == "" {
 		return &NoneCache{}, nil
 	}
 
