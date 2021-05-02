@@ -94,12 +94,12 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// Delegates the Content-Length Header creation to the final body write.
 	rw.Header().Del(contentLength)
 
-	processor, err := processor.New(a.config.Config)
+	p, err := processor.New(a.config.Config)
 	if err != nil {
 		panic(err)
 	}
 
-	optimized, err := processor.Optimize(bodyBytes, "", "", 75)
+	optimized, err := p.Optimize(bodyBytes, "", "", 75)
 	if err != nil {
 		panic(err)
 	}
