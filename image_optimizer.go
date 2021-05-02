@@ -6,7 +6,9 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/agravelot/image_optimizer/cache"
 	"github.com/agravelot/image_optimizer/config"
 	"github.com/agravelot/image_optimizer/processor"
 )
@@ -52,10 +54,26 @@ const (
 )
 
 func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	// Ignore non image requests
-
 	// TODO Check if cacheable
+
 	// Return cached result here.
+	c, err := cache.New(a.config.Config)
+	if err != nil {
+		panic(err)
+	}
+
+	key, err := cache.Tokenize(req)
+	if err != nil {
+		panic(err)
+	}
+
+	if v, err := c.Get(key); err == nil {
+		_, err = rw.Write(v)
+		if err != nil {
+			panic(err)
+		}
+		return
+	}
 
 	wrappedWriter := &responseWriter{
 		ResponseWriter: rw,
@@ -92,6 +110,10 @@ func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
+	err = c.Set(key, optimized, 100*time.Second)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // IsImageResponse Determine with Content-Type header if the response is an image.

@@ -2,6 +2,7 @@ package cache
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/agravelot/image_optimizer/config"
@@ -26,6 +27,10 @@ func New(conf config.Config) (Cache, error) {
 	// 		client: client,
 	// 	}, nil
 	// }
+
+	if conf.Cache == "file" {
+		return newFileCache(conf.File.Path, 100*time.Second)
+	}
 
 	if conf.Cache == "memory" {
 		return &MemoryCache{
