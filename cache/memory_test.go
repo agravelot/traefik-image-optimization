@@ -108,7 +108,7 @@ func TestMemoryCache_Set(t *testing.T) {
 	}
 }
 
-func BenchmarkFileCache_Get(b *testing.B) {
+func BenchmarkMemoryCache_Get(b *testing.B) {
 	testCacheKey := "test-key"
 
 	c := &MemoryCache{
@@ -126,7 +126,7 @@ func BenchmarkFileCache_Get(b *testing.B) {
 	}
 }
 
-func BenchmarkFileCache_SetSameKey(b *testing.B) {
+func BenchmarkMemoryCache_SetSameKey(b *testing.B) {
 	testCacheKey := "test-key"
 
 	c := &MemoryCache{
@@ -144,7 +144,7 @@ func BenchmarkFileCache_SetSameKey(b *testing.B) {
 	}
 }
 
-func BenchmarkFileCache_SetNewKey(b *testing.B) {
+func BenchmarkMemoryCache_SetNewKey(b *testing.B) {
 	testCacheKey := "test-key"
 
 	c := &MemoryCache{
