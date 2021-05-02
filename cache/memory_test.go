@@ -96,7 +96,12 @@ func TestMemoryCache_Set(t *testing.T) {
 				t.Errorf("MemoryCache.Set() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if !bytes.Equal(c.m[tt.args.key], tt.args.v) {
+			v, err := c.Get(tt.args.key)
+			if err != nil {
+				panic(err)
+			}
+
+			if !bytes.Equal(v, tt.args.v) {
 				t.Errorf("result differ")
 			}
 		})
