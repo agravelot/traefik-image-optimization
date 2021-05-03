@@ -79,9 +79,13 @@ func (ip *ImaginaryProcessor) Optimize(media []byte, origialFormat string, targe
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = res.Body.Close()
 	if err != nil {
 		return nil, err
 	}
