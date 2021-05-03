@@ -2,6 +2,7 @@ package processor
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
@@ -10,6 +11,23 @@ import (
 
 	"github.com/agravelot/image_optimizer/config"
 )
+
+type pipelineOperationParams struct {
+	Font      string  `json:"font,omitempty"`
+	Height    int     `json:"height,omitempty"`
+	Opacity   float64 `json:"opacity,omitempty"`
+	Rotate    int     `json:"rotate,omitempty"`
+	Text      string  `json:"text,omitempty"`
+	Textwidth int     `json:"textwidth,omitempty"`
+	Type      string  `json:"type,omitempty"`
+	Width     int     `json:"width,omitempty"`
+	StripMeta bool    `json:"stripmeta,omitempty"`
+}
+
+type pipelineOperation struct {
+	Operation string                  `json:"operation"`
+	Params    pipelineOperationParams `json:"params"`
+}
 
 type ImaginaryProcessor struct {
 	Url    string
@@ -49,9 +67,15 @@ func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
 
 func (ip *ImaginaryProcessor) Optimize(media []byte, originalFormat string, targetFormat string, quality, width int) ([]byte, error) {
 
-	println(width)
+	ope := []pipelineOperation{
+		{Operation: "resize", Params: pipelineOperationParams{Width: width, StripMeta: true}},
+		{Operation: "convert", Params: pipelineOperationParams{Type: "webp"}}}
+	opString, err := json.Marshal(ope)
+	if err != nil {
+		return nil, err
+	}
 
-	u := fmt.Sprintf("%s/convert?type=webp&field=file", ip.Url)
+	u := fmt.Sprintf("%s/pipeline?operations=%s", ip.Url, url.QueryEscape(string(opString)))
 	method := "POST"
 
 	payload := &bytes.Buffer{}
