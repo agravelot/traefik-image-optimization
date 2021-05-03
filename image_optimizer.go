@@ -103,7 +103,12 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// Delegates the Content-Length Header creation to the final body write.
 	rw.Header().Del(contentLength)
 
-	optimized, err := a.p.Optimize(bodyBytes, "", "", 75)
+	width, err := imageWidthRequest(req)
+	if err != nil {
+		panic(err)
+	}
+
+	optimized, err := a.p.Optimize(bodyBytes, "", "", 75, width)
 	if err != nil {
 		panic(err)
 	}
