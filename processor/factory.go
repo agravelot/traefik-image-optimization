@@ -7,7 +7,7 @@ import (
 )
 
 type Processor interface {
-	Optimize(media []byte, origialFormat string, targetFormat string, quality int) ([]byte, error)
+	Optimize(media []byte, originalFormat string, targetFormat string, quality int) ([]byte, error)
 }
 
 func New(conf config.Config) (Processor, error) {

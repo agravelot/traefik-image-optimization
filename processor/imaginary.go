@@ -47,19 +47,19 @@ func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
 	}, nil
 }
 
-func (ip *ImaginaryProcessor) Optimize(media []byte, origialFormat string, targetFormat string, quality int) ([]byte, error) {
+func (ip *ImaginaryProcessor) Optimize(media []byte, originalFormat string, targetFormat string, quality int) ([]byte, error) {
 
-	url := fmt.Sprintf("%s/convert?type=webp&field=file", ip.Url)
+	u := fmt.Sprintf("%s/convert?type=webp&field=file", ip.Url)
 	method := "POST"
 
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
-	fileWritrer, err := writer.CreateFormFile("file", "tmp.jpg")
+	fileWriter, err := writer.CreateFormFile("file", "tmp.jpg")
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = fileWritrer.Write(media)
+	_, err = fileWriter.Write(media)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (ip *ImaginaryProcessor) Optimize(media []byte, origialFormat string, targe
 		return nil, err
 	}
 
-	req, err := http.NewRequest(method, url, payload)
+	req, err := http.NewRequest(method, u, payload)
 
 	if err != nil {
 		return nil, err

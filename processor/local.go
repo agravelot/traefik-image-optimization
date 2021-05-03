@@ -3,7 +3,7 @@ package processor
 type LocalProcessor struct {
 }
 
-func (lp *LocalProcessor) Optimize(media []byte, origialFormat string, targetFormat string, quality int) ([]byte, error) {
+func (lp *LocalProcessor) Optimize(media []byte, originalFormat string, targetFormat string, quality int) ([]byte, error) {
 
 	// newImage, err := bimg.NewImage(media).Convert(bimg.WEBP)
 	// if err != nil {
