@@ -13,7 +13,6 @@ type Cache interface {
 	Set(key string, val []byte, expiry time.Duration) error
 }
 
-// TODO Use singleton patern ?
 func New(conf config.Config) (Cache, error) {
 	// if conf.Processor == "redis" {
 	// 	opt, err := redis.ParseURL(conf.Redis.Url)

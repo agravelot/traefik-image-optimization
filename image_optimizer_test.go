@@ -10,7 +10,7 @@ import (
 	"github.com/agravelot/image_optimizer/config"
 )
 
-func TestDemo(t *testing.T) {
+func TestImageOptimizer_ServeHTTP(t *testing.T) {
 	type args struct {
 		config config.Config
 	}
@@ -24,7 +24,7 @@ func TestDemo(t *testing.T) {
 	}{
 		{
 			name:                      "should pass with processor",
-			args:                      args{config: config.Config{Processor: "imaginary"}},
+			args:                      args{config: config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"}}},
 			want:                      false,
 			wantErr:                   false,
 			remoteResponseContentType: "text/html",
@@ -59,6 +59,7 @@ func TestDemo(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := CreateConfig()
 			cfg.Processor = tt.args.config.Processor
+			cfg.Imaginary = tt.args.config.Imaginary
 
 			ctx := context.Background()
 			next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
