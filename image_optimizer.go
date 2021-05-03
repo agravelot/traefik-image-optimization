@@ -23,14 +23,14 @@ func CreateConfig() *Config {
 	return &Config{}
 }
 
-// Demo a Demo plugin.
-type Demo struct {
+// ImageOptimizer middleware plugin base.
+type ImageOptimizer struct {
 	config Config
 	next   http.Handler
 	name   string
 }
 
-// New created a new Demo plugin.
+// New created a new ImageOptimizer plugin.
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
 
 	log.Println("Loading image optimization plugin...")
@@ -41,7 +41,7 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 		return nil, fmt.Errorf("processor must be defined")
 	}
 
-	return &Demo{
+	return &ImageOptimizer{
 		config: *config,
 		next:   next,
 		name:   name,
@@ -53,7 +53,7 @@ const (
 	contentType   = "Content-Type"
 )
 
-func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// TODO Check if cacheable
 
 	// Return cached result here.
