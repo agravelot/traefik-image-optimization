@@ -141,3 +141,67 @@ func TestIsImageResponse(t *testing.T) {
 		})
 	}
 }
+
+func TestImageWidthRequest(t *testing.T) {
+	type args struct {
+		url string
+	}
+	ctx := context.Background()
+
+	tests := []struct {
+		name    string
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{
+			name:    "should return error with positve width",
+			args:    args{url: "http://localhost?w=124"},
+			want:    124,
+			wantErr: false,
+		},
+		{
+			name:    "should return error with negative width",
+			args:    args{url: "http://localhost?w=-124"},
+			want:    0,
+			wantErr: true,
+		},
+		{
+			name:    "should return error with text as width",
+			args:    args{url: "http://localhost?w=azeaze"},
+			want:    0,
+			wantErr: true,
+		},
+		{
+			name:    "should return error with empty width",
+			args:    args{url: "http://localhost?w="},
+			want:    0,
+			wantErr: false,
+		},
+		{
+			name:    "should return error with no width",
+			args:    args{url: "http://localhost"},
+			want:    0,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, tt.args.url, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got, err := imageWidthRequest(req)
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("imageWidthRequest() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if got != tt.want {
+				t.Errorf("ImageWidthRequest() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
