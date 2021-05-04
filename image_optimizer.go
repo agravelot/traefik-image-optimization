@@ -74,6 +74,7 @@ const (
 func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// TODO Check if cacheable
 
+	targetFormat := "image/webp"
 	// Return cached result here.
 	key, err := cache.Tokenize(req)
 	if err != nil {
@@ -81,7 +82,9 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if v, err := a.c.Get(key); err == nil {
-		rw.Header().Add(cacheStatus, cacheHitStatus)
+		rw.Header().Set(cacheStatus, cacheHitStatus)
+		rw.Header().Set(contentLength, fmt.Sprint(len(v)))
+		rw.Header().Add(contentType, targetFormat)
 		_, err = rw.Write(v)
 		if err != nil {
 			panic(err)
@@ -91,10 +94,12 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	wrappedWriter := &responseWriter{
 		ResponseWriter: rw,
+		bypassHeader:   true,
 	}
 
 	a.next.ServeHTTP(wrappedWriter, req)
 
+	wrappedWriter.bypassHeader = false
 	bodyBytes := wrappedWriter.buffer.Bytes()
 
 	// If not image response, forward original and leave it here.
@@ -111,19 +116,17 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	optimized, ct, err := a.p.Optimize(bodyBytes, rw.Header().Get(contentType), "image/webp", 75, width)
+	optimized, ct, err := a.p.Optimize(bodyBytes, rw.Header().Get(contentType), targetFormat, 75, width)
 	if err != nil {
 		panic(err)
 	}
 
-	// Delegates the Content-Length and Content-Type Headers creation to the final body write.
-	rw.Header().Del(contentLength)
+	rw.Header().Set(contentLength, fmt.Sprint(len(optimized)))
 	rw.Header().Set(contentType, ct)
-	rw.Header().Add(cacheStatus, cacheMissStatus)
+	rw.Header().Set(cacheStatus, cacheMissStatus)
 
 	_, err = rw.Write(optimized)
 	if err != nil {
-		log.Printf("unable to write rewrited body: %v", err)
 		panic(err)
 	}
 

@@ -20,6 +20,7 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 		args                      args
 		wantedContentType         string
 		wantedCacheStatus         string
+		wantedSecondCacheStatus   string
 		remoteResponseContentType string
 		remoteResponseContent     []byte
 		want                      bool
@@ -30,44 +31,52 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			args:                      args{config: config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"}}},
 			want:                      false,
 			wantErr:                   false,
+			wantedCacheStatus:         "",
+			wantedSecondCacheStatus:   "",
 			wantedContentType:         "text/html",
 			remoteResponseContentType: "text/html",
 			remoteResponseContent:     []byte("dummy response"),
 		},
 		{
-			name:                      "should not pass without processor",
+			name:                      "should not pass without processor and cache and return no cache status header",
 			args:                      args{config: config.Config{Processor: ""}},
 			want:                      false,
+			wantedCacheStatus:         "",
+			wantedSecondCacheStatus:   "",
 			wantErr:                   true,
 			wantedContentType:         "text/html",
 			remoteResponseContentType: "text/html",
 			remoteResponseContent:     []byte("dummy response"),
 		},
 		{
-			name:                      "should not modify image with none driver",
-			args:                      args{config: config.Config{Processor: "none"}},
+			name:                      "should not modify image with none driver and cache file driver with cache status",
+			args:                      args{config: config.Config{Processor: "none", Cache: "file", File: config.FileCacheConfig{Path: "./.cache"}}},
 			want:                      false,
 			wantErr:                   false,
 			wantedCacheStatus:         "miss",
+			wantedSecondCacheStatus:   "hit",
 			wantedContentType:         "image/jpeg",
 			remoteResponseContentType: "image/jpeg",
 			remoteResponseContent:     []byte("dummy image"),
 		},
 		{
-			name:                      "should not modify image with none driver",
-			args:                      args{config: config.Config{Processor: "local"}},
+			name:                      "should not modify image with none driver and cache file driver with cache status",
+			args:                      args{config: config.Config{Processor: "local", Cache: "file", File: config.FileCacheConfig{Path: "./.cache"}}},
 			want:                      false,
 			wantErr:                   false,
 			wantedCacheStatus:         "miss",
+			wantedSecondCacheStatus:   "hit",
 			wantedContentType:         "image/webp",
 			remoteResponseContentType: "image/jpeg",
 			remoteResponseContent:     []byte("dummy image"),
 		},
 		{
-			name:                      "should return original response if not image request",
+			name:                      "should return original response if not image request and return no cache status header",
 			args:                      args{config: config.Config{Processor: "none"}},
 			want:                      false,
 			wantErr:                   false,
+			wantedCacheStatus:         "",
+			wantedSecondCacheStatus:   "",
 			wantedContentType:         "text/html",
 			remoteResponseContentType: "text/html",
 			remoteResponseContent:     []byte("dummy response"),
@@ -78,6 +87,8 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			cfg := CreateConfig()
 			cfg.Processor = tt.args.config.Processor
 			cfg.Imaginary = tt.args.config.Imaginary
+			cfg.Cache = tt.args.config.Cache
+			cfg.File = tt.args.config.File
 
 			ctx := context.Background()
 			next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -98,12 +109,11 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 				return
 			}
 
-			recorder := httptest.NewRecorder()
-
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost", nil)
 			if err != nil {
 				t.Fatal(err)
 			}
+			recorder := httptest.NewRecorder()
 
 			handler.ServeHTTP(recorder, req)
 
@@ -111,14 +121,31 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 				t.Fatal("response are not equals")
 			}
 
-			fmt.Printf("%+v\n", recorder.Header())
-
 			if recorder.Header().Get("content-type") != tt.wantedContentType {
-				t.Fatalf("response content-type expected: %s got: %s", tt.wantedContentType, recorder.Header().Get("content-type"))
+				t.Fatalf("response content-type expected: %v got: %v", tt.wantedContentType, recorder.Header().Get("content-type"))
 			}
 
 			if recorder.Header().Get("cache-status") != tt.wantedCacheStatus {
-				t.Fatalf("response cache-status expected: %s got: %s", tt.wantedCacheStatus, recorder.Header().Get("cache-status"))
+				fmt.Printf("a:%#v\n", tt.wantedCacheStatus)
+				fmt.Printf("b:%#v\n", recorder.Header().Get("cache-status"))
+
+				t.Fatalf("response cache-status expected: %v got: %v", tt.wantedCacheStatus, recorder.Header().Get("cache-status"))
+			}
+
+			recorder = httptest.NewRecorder()
+
+			handler.ServeHTTP(recorder, req)
+
+			if !bytes.Equal(recorder.Body.Bytes(), tt.remoteResponseContent) {
+				t.Fatal("response are not equals")
+			}
+
+			if recorder.Header().Get("content-type") != tt.wantedContentType {
+				t.Fatalf("response content-type expected: %v got: %v", tt.wantedContentType, recorder.Header().Get("content-type"))
+			}
+
+			if recorder.Header().Get("cache-status") != tt.wantedSecondCacheStatus {
+				t.Fatalf("response cache-status expected: %v got: %v", tt.wantedSecondCacheStatus, recorder.Header().Get("cache-status"))
 			}
 		})
 	}
