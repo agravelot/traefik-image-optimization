@@ -68,8 +68,13 @@ func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
 func (ip *ImaginaryProcessor) Optimize(media []byte, originalFormat string, targetFormat string, quality, width int) ([]byte, string, error) {
 
 	ope := []pipelineOperation{
-		{Operation: "resize", Params: pipelineOperationParams{Width: width, StripMeta: true}},
-		{Operation: "convert", Params: pipelineOperationParams{Type: "webp"}}}
+		{Operation: "convert", Params: pipelineOperationParams{Type: "webp", StripMeta: true}},
+	}
+
+	if width > 0 {
+		ope = append(ope, pipelineOperation{Operation: "resize", Params: pipelineOperationParams{Width: width}})
+	}
+
 	opString, err := json.Marshal(ope)
 	if err != nil {
 		return nil, "", err
