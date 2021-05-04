@@ -1,11 +1,9 @@
-displayName: Demo Plugin
+displayName: Image optimizer
 type: middleware
 
-import: github.com/traefik/plugindemo
+import: github.com/agravelot/image_optimizer
 
-summary: '[Demo] Add Request Header'
+summary: 'Image optimizer middleware is a middleware designed to optimize image responses on the fly.'
 
 testData:
-  Headers:
-    X-Demo: test
-    X-URL: '{{URL}}'
+

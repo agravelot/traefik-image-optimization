@@ -1,0 +1,17 @@
+version: "3"
+services:
+  imaginary:
+    image: h2non/imaginary:latest
+    expose: 
+      - 9000
+    networks: 
+      - traefik-net
+    environment:
+       PORT: 9000
+       DEBUG: "*"
+    command: -enable-url-source -http-cache-ttl 0
+
+networks:
+    traefik-net:
+      external:
+        name: traefik-net

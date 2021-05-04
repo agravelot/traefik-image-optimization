@@ -1,3 +1,3 @@
-module github.com/traefik/plugindemo
+module github.com/agravelot/image_optimizer
 
-go 1.15
+go 1.16
