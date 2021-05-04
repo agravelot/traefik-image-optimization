@@ -6,4 +6,7 @@ import: github.com/agravelot/image_optimizer
 summary: 'Image optimizer middleware is a middleware designed to optimize image responses on the fly.'
 
 testData:
+  config:
+    processor: none
+    cache: none
 
