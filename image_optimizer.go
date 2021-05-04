@@ -25,7 +25,7 @@ func CreateConfig() *Config {
 	return &Config{}
 }
 
-// ImageOptimizer middleware plugin base.
+// ImageOptimizer middleware plugin struct.
 type ImageOptimizer struct {
 	next http.Handler
 	name string
@@ -63,8 +63,12 @@ func New(ctx context.Context, next http.Handler, conf *Config, name string) (htt
 }
 
 const (
-	contentLength = "Content-Length"
-	contentType   = "Content-Type"
+	contentLength    = "Content-Length"
+	contentType      = "Content-Type"
+	cacheStatus      = "Cache-Status"
+	cacheHitStatus   = "hit"
+	cacheMissStatus  = "miss"
+	cacheErrorStatus = "error"
 )
 
 func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
@@ -77,6 +81,7 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if v, err := a.c.Get(key); err == nil {
+		rw.Header().Add(cacheStatus, cacheHitStatus)
 		_, err = rw.Write(v)
 		if err != nil {
 			panic(err)
@@ -92,6 +97,7 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	bodyBytes := wrappedWriter.buffer.Bytes()
 
+	// If not image response, forward original and leave it here.
 	if !isImageResponse(rw) {
 		_, err = rw.Write(bodyBytes)
 		if err != nil {
@@ -113,6 +119,7 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// Delegates the Content-Length and Content-Type Headers creation to the final body write.
 	rw.Header().Del(contentLength)
 	rw.Header().Set(contentType, ct)
+	rw.Header().Add(cacheStatus, cacheMissStatus)
 
 	_, err = rw.Write(optimized)
 	if err != nil {

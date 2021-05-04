@@ -3,6 +3,7 @@ package image_optimizer
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,6 +19,7 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 		name                      string
 		args                      args
 		wantedContentType         string
+		wantedCacheStatus         string
 		remoteResponseContentType string
 		remoteResponseContent     []byte
 		want                      bool
@@ -46,6 +48,7 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			args:                      args{config: config.Config{Processor: "none"}},
 			want:                      false,
 			wantErr:                   false,
+			wantedCacheStatus:         "miss",
 			wantedContentType:         "image/jpeg",
 			remoteResponseContentType: "image/jpeg",
 			remoteResponseContent:     []byte("dummy image"),
@@ -55,6 +58,7 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			args:                      args{config: config.Config{Processor: "local"}},
 			want:                      false,
 			wantErr:                   false,
+			wantedCacheStatus:         "miss",
 			wantedContentType:         "image/webp",
 			remoteResponseContentType: "image/jpeg",
 			remoteResponseContent:     []byte("dummy image"),
@@ -107,8 +111,14 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 				t.Fatal("response are not equals")
 			}
 
+			fmt.Printf("%+v\n", recorder.Header())
+
 			if recorder.Header().Get("content-type") != tt.wantedContentType {
 				t.Fatalf("response content-type expected: %s got: %s", tt.wantedContentType, recorder.Header().Get("content-type"))
+			}
+
+			if recorder.Header().Get("cache-status") != tt.wantedCacheStatus {
+				t.Fatalf("response cache-status expected: %s got: %s", tt.wantedCacheStatus, recorder.Header().Get("cache-status"))
 			}
 		})
 	}
