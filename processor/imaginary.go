@@ -65,14 +65,14 @@ func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
 	}, nil
 }
 
-func (ip *ImaginaryProcessor) Optimize(media []byte, originalFormat string, targetFormat string, quality, width int) ([]byte, error) {
+func (ip *ImaginaryProcessor) Optimize(media []byte, originalFormat string, targetFormat string, quality, width int) ([]byte, string, error) {
 
 	ope := []pipelineOperation{
 		{Operation: "resize", Params: pipelineOperationParams{Width: width, StripMeta: true}},
 		{Operation: "convert", Params: pipelineOperationParams{Type: "webp"}}}
 	opString, err := json.Marshal(ope)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	u := fmt.Sprintf("%s/pipeline?operations=%s", ip.Url, url.QueryEscape(string(opString)))
@@ -82,39 +82,39 @@ func (ip *ImaginaryProcessor) Optimize(media []byte, originalFormat string, targ
 	writer := multipart.NewWriter(payload)
 	fileWriter, err := writer.CreateFormFile("file", "tmp.jpg")
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	_, err = fileWriter.Write(media)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	err = writer.Close()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	req, err := http.NewRequest(method, u, payload)
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	res, err := ip.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	err = res.Body.Close()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return body, nil
+	return body, "image/webp", nil
 }

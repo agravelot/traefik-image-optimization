@@ -17,6 +17,7 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 	tests := []struct {
 		name                      string
 		args                      args
+		wantedContentType         string
 		remoteResponseContentType string
 		remoteResponseContent     []byte
 		want                      bool
@@ -27,6 +28,7 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			args:                      args{config: config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"}}},
 			want:                      false,
 			wantErr:                   false,
+			wantedContentType:         "text/html",
 			remoteResponseContentType: "text/html",
 			remoteResponseContent:     []byte("dummy response"),
 		},
@@ -35,14 +37,25 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			args:                      args{config: config.Config{Processor: ""}},
 			want:                      false,
 			wantErr:                   true,
+			wantedContentType:         "text/html",
 			remoteResponseContentType: "text/html",
 			remoteResponseContent:     []byte("dummy response"),
 		},
 		{
-			name:                      "should pass with processor with image response",
+			name:                      "should not modify image with none driver",
 			args:                      args{config: config.Config{Processor: "none"}},
 			want:                      false,
 			wantErr:                   false,
+			wantedContentType:         "image/jpeg",
+			remoteResponseContentType: "image/jpeg",
+			remoteResponseContent:     []byte("dummy image"),
+		},
+		{
+			name:                      "should not modify image with none driver",
+			args:                      args{config: config.Config{Processor: "local"}},
+			want:                      false,
+			wantErr:                   false,
+			wantedContentType:         "image/webp",
 			remoteResponseContentType: "image/jpeg",
 			remoteResponseContent:     []byte("dummy image"),
 		},
@@ -51,6 +64,7 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			args:                      args{config: config.Config{Processor: "none"}},
 			want:                      false,
 			wantErr:                   false,
+			wantedContentType:         "text/html",
 			remoteResponseContentType: "text/html",
 			remoteResponseContent:     []byte("dummy response"),
 		},
@@ -64,7 +78,10 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			ctx := context.Background()
 			next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 				rw.Header().Add("content-type", tt.remoteResponseContentType)
-				rw.Write([]byte(tt.remoteResponseContent))
+				_, err := rw.Write(tt.remoteResponseContent)
+				if err != nil {
+					t.Fatal(err)
+				}
 			})
 
 			handler, err := New(ctx, next, cfg, "demo-plugin")
@@ -88,6 +105,10 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 
 			if !bytes.Equal(recorder.Body.Bytes(), tt.remoteResponseContent) {
 				t.Fatal("response are not equals")
+			}
+
+			if recorder.Header().Get("content-type") != tt.wantedContentType {
+				t.Fatalf("response content-type expected: %s got: %s", tt.wantedContentType, recorder.Header().Get("content-type"))
 			}
 		})
 	}
