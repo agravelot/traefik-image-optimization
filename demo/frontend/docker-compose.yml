@@ -2,17 +2,20 @@ version: "3.8"
 
 services:
   frontend:
-    build: ../frontend
+    image: nginx:alpine
     networks: 
       - traefik-net
     expose:
       - 80
+    volumes:
+      - "../frontend/html:/usr/share/nginx/html"
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.demo.rule=Host(`demo.localhost`)"
-    - "traefik.http.middlewares.image_optimizer.plugin.dev.foo=bar"
     - "traefik.http.middlewares.image_optimizer.plugin.dev.config.processor=imaginary"
     - "traefik.http.middlewares.image_optimizer.plugin.dev.config.imaginary.url=http://imaginary:9000"
+    - "traefik.http.middlewares.image_optimizer.plugin.dev.config.cache=file"
+    - "traefik.http.middlewares.image_optimizer.plugin.dev.config.file.path=/root"
     - "traefik.http.routers.demo.middlewares=image_optimizer"
 
 networks:
