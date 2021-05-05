@@ -1,3 +1,4 @@
+// Package imageopti Image optimizer plugin
 package imageopti
 
 import (
@@ -75,24 +76,18 @@ const (
 	cacheHitStatus  = "hit"
 	cacheMissStatus = "miss"
 	cacheExpiry     = 100 * time.Second
+	targetFormat    = "image/webp"
 )
 
 func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// TODO Check if cacheable
-
-	targetFormat := "image/webp"
-	// Return cached result here.
 	key, err := cache.Tokenize(req)
 	if err != nil {
 		panic(err)
 	}
-
+	// Return cached result here.
 	if v, err := a.c.Get(key); err == nil {
-		rw.Header().Set(cacheStatus, cacheHitStatus)
-		rw.Header().Set(contentLength, fmt.Sprint(len(v)))
-		rw.Header().Add(contentType, targetFormat)
-		_, err = rw.Write(v)
-
+		err = writeResponse(rw, targetFormat, cacheHitStatus, v)
 		if err != nil {
 			panic(err)
 		}
@@ -132,11 +127,7 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	rw.Header().Set(contentLength, fmt.Sprint(len(optimized)))
-	rw.Header().Set(contentType, ct)
-	rw.Header().Set(cacheStatus, cacheMissStatus)
-
-	_, err = rw.Write(optimized)
+	err = writeResponse(rw, ct, cacheMissStatus, optimized)
 	if err != nil {
 		panic(err)
 	}
@@ -145,6 +136,16 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func writeResponse(rw http.ResponseWriter, ct, cs string, b []byte) error {
+	rw.Header().Set(contentLength, fmt.Sprint(len(b)))
+	rw.Header().Set(contentType, ct)
+	rw.Header().Set(cacheStatus, cs)
+
+	_, err := rw.Write(b)
+
+	return fmt.Errorf("unable to send response: %w", err)
 }
 
 func imageWidthRequest(req *http.Request) (int, error) {
@@ -157,7 +158,7 @@ func imageWidthRequest(req *http.Request) (int, error) {
 
 	v, err := strconv.Atoi(w)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("unable to convert w query param to int: %w", err)
 	}
 
 	if v < 0 {
