@@ -58,7 +58,7 @@ func isValidURL(s string) error {
 
 // NewImaginary instantiate a new imaginary instance with given config.
 func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
-	err := isValidURL(conf.Imaginary.Url)
+	err := isValidURL(conf.Imaginary.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
 		client: http.Client{
 			Timeout: httpTimeout,
 		},
-		URL: conf.Imaginary.Url,
+		URL: conf.Imaginary.URL,
 	}, nil
 }
 

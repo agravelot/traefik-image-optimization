@@ -31,9 +31,9 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 			args: args{
 				config: config.Config{
 					Processor: "imaginary",
-					Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"},
+					Imaginary: config.ImaginaryProcessorConfig{URL: "http://localhost"},
 					Cache:     "none",
-					Redis:     config.RedisCacheConfig{Url: ""},
+					Redis:     config.RedisCacheConfig{URL: ""},
 					File:      config.FileCacheConfig{Path: ""},
 				},
 			},
@@ -51,9 +51,9 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 				config: config.Config{
 					Processor: "",
 					Cache:     "",
-					Redis:     config.RedisCacheConfig{Url: ""},
+					Redis:     config.RedisCacheConfig{URL: ""},
 					File:      config.FileCacheConfig{Path: ""},
-					Imaginary: config.ImaginaryProcessorConfig{Url: ""},
+					Imaginary: config.ImaginaryProcessorConfig{URL: ""},
 				},
 			},
 			want:                      false,
@@ -82,9 +82,9 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 				config: config.Config{
 					Processor: "local",
 					Cache:     "memory",
-					Redis:     config.RedisCacheConfig{Url: ""},
+					Redis:     config.RedisCacheConfig{URL: ""},
 					File:      config.FileCacheConfig{Path: ""},
-					Imaginary: config.ImaginaryProcessorConfig{Url: ""},
+					Imaginary: config.ImaginaryProcessorConfig{URL: ""},
 				},
 			},
 			want:                      false,
@@ -101,9 +101,9 @@ func TestImageOptimizer_ServeHTTP(t *testing.T) {
 				config: config.Config{
 					Processor: "none",
 					Cache:     "",
-					Redis:     config.RedisCacheConfig{Url: ""},
+					Redis:     config.RedisCacheConfig{URL: ""},
 					File:      config.FileCacheConfig{Path: ""},
-					Imaginary: config.ImaginaryProcessorConfig{Url: ""},
+					Imaginary: config.ImaginaryProcessorConfig{URL: ""},
 				},
 			},
 			want:                      false,

@@ -36,7 +36,7 @@ func TestNew(t *testing.T) {
 			args: args{
 				config.Config{
 					Processor: "imaginary",
-					Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"},
+					Imaginary: config.ImaginaryProcessorConfig{URL: "http://localhost"},
 					Cache:     "unsupported",
 				},
 			},

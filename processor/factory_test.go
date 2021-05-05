@@ -27,9 +27,9 @@ func TestNew(t *testing.T) {
 			args: args{
 				config.Config{
 					Processor: "imaginary",
-					Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"},
+					Imaginary: config.ImaginaryProcessorConfig{URL: "http://localhost"},
 					Cache:     "none",
-					Redis:     config.RedisCacheConfig{Url: ""},
+					Redis:     config.RedisCacheConfig{URL: ""},
 					File:      config.FileCacheConfig{Path: ""},
 				},
 			},
@@ -38,7 +38,7 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name:    "should not be able to init imaginary without valid url",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "localhost"}}},
+			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{URL: "localhost"}}},
 			want:    nil,
 			wantErr: true,
 		},
@@ -47,7 +47,7 @@ func TestNew(t *testing.T) {
 			args: args{
 				config.Config{
 					Processor: "imaginary",
-					Imaginary: config.ImaginaryProcessorConfig{Url: "htt://localhost"},
+					Imaginary: config.ImaginaryProcessorConfig{URL: "htt://localhost"},
 				},
 			},
 			want:    nil,

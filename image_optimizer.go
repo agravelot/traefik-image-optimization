@@ -28,8 +28,8 @@ func CreateConfig() *Config {
 		config.Config{
 			Processor: "",
 			Cache:     "",
-			Imaginary: config.ImaginaryProcessorConfig{Url: ""},
-			Redis:     config.RedisCacheConfig{Url: ""},
+			Imaginary: config.ImaginaryProcessorConfig{URL: ""},
+			Redis:     config.RedisCacheConfig{URL: ""},
 			File:      config.FileCacheConfig{Path: ""},
 		},
 	}
