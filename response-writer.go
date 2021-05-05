@@ -27,7 +27,6 @@ func (r *responseWriter) Write(p []byte) (int, error) {
 	}
 
 	i, err := r.buffer.Write(p)
-
 	if err != nil {
 		return i, fmt.Errorf("unable to write response body: %w", err)
 	}
