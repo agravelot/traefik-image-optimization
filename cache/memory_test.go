@@ -13,9 +13,11 @@ func TestMemoryCache_Get(t *testing.T) {
 	type fields struct {
 		m map[string][]byte
 	}
+
 	type args struct {
 		key string
 	}
+
 	tests := []struct {
 		name    string
 		fields  fields
@@ -62,10 +64,12 @@ func TestMemoryCache_Set(t *testing.T) {
 	type fields struct {
 		m map[string][]byte
 	}
+
 	type args struct {
 		key string
 		v   []byte
 	}
+
 	tests := []struct {
 		name    string
 		fields  fields
@@ -108,7 +112,7 @@ func TestMemoryCache_Set(t *testing.T) {
 
 			time.Sleep(1 * time.Second)
 
-			v, err = c.Get(tt.args.key)
+			_, err = c.Get(tt.args.key)
 			if err == nil {
 				t.Errorf("value must be deleted after expiry")
 			}
@@ -174,9 +178,11 @@ func TestMemoryCache_delete(t *testing.T) {
 	type fields struct {
 		m map[string][]byte
 	}
+
 	type args struct {
 		key string
 	}
+
 	tests := []struct {
 		name    string
 		fields  fields

@@ -1,3 +1,4 @@
+// Package processor Handle image processing, including resizing, converting and stripping unwanted metadata.
 package processor
 
 import (
@@ -6,10 +7,12 @@ import (
 	"github.com/agravelot/imageopti/config"
 )
 
+// Processor Define processor interface.
 type Processor interface {
 	Optimize(media []byte, originalFormat string, targetFormat string, quality, width int) ([]byte, string, error)
 }
 
+// New Processor factory from dynamic configurations.
 func New(conf config.Config) (Processor, error) {
 	if conf.Processor == "imaginary" {
 		p, err := NewImaginary(conf)

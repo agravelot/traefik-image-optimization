@@ -1,7 +1,9 @@
 package processor
 
+// NoneProcessor dummy processor, using null pattern.
 type NoneProcessor struct{}
 
-func (lp *NoneProcessor) Optimize(media []byte, originalFormat string, targetFormat string, quality, width int) ([]byte, string, error) {
-	return media, originalFormat, nil
+// Optimize return same data from media.
+func (lp *NoneProcessor) Optimize(media []byte, of string, tf string, q, w int) ([]byte, string, error) {
+	return media, of, nil
 }

@@ -41,6 +41,8 @@
     "funlen", # Re-enable it
     "gocognit", # Re-enable it
     "cyclop", # Re-enable it
+    "exhaustivestruct",
+    "nilerr",
   ]
 
 [issues]

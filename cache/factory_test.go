@@ -12,6 +12,7 @@ func TestNew(t *testing.T) {
 	type args struct {
 		conf config.Config
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -31,47 +32,17 @@ func TestNew(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "should not be able to init cache without valid driver",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"}, Cache: "unsupported"}},
+			name: "should not be able to init cache without valid driver",
+			args: args{
+				config.Config{
+					Processor: "imaginary",
+					Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"},
+					Cache:     "unsupported",
+				},
+			},
 			want:    nil,
 			wantErr: true,
 		},
-		// {
-		// 	name:    "should not be able to init imaginary without valid url",
-		// 	args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "localhost"}, Cache: "memory"}},
-		// 	want:    nil,
-		// 	wantErr: true,
-		// },
-		// {
-		// 	name:    "should not be able to init imaginary without valid url 2 ",
-		// 	args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryConfig{Url: "htt://localhost"}}},
-		// 	want:    nil,
-		// 	wantErr: true,
-		// },
-		// {
-		// 	name:    "should not be able to init imaginary without url",
-		// 	args:    args{config.Config{Processor: "imaginary"}},
-		// 	want:    nil,
-		// 	wantErr: true,
-		// },
-		// {
-		// 	name:    "should be able to return local optimizer",
-		// 	args:    args{config.Config{Processor: "local"}},
-		// 	want:    &processor.LocalProcessor{},
-		// 	wantErr: false,
-		// },
-		// {
-		// 	name:    "should return error with unsupported processor",
-		// 	args:    args{config.Config{Processor: "unsupported"}},
-		// 	want:    nil,
-		// 	wantErr: true,
-		// },
-		// {
-		// 	name:    "should return error with empty processor",
-		// 	args:    args{config.Config{Processor: "unsupported"}},
-		// 	want:    nil,
-		// 	wantErr: true,
-		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
