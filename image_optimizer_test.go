@@ -1,4 +1,4 @@
-package image_optimizer
+package imageopti
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/agravelot/image_optimizer/config"
+	"github.com/agravelot/imageopti/config"
 )
 
 func TestImageOptimizer_ServeHTTP(t *testing.T) {

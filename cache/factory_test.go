@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/agravelot/image_optimizer/cache"
-	"github.com/agravelot/image_optimizer/config"
+	"github.com/agravelot/imageopti/cache"
+	"github.com/agravelot/imageopti/config"
 )
 
 func TestNew(t *testing.T) {

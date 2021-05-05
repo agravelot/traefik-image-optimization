@@ -28,8 +28,8 @@ pilot:
 
 experimental:
   plugins:
-    image_optimizer:
-      moduleName: github.com/agravelot/image_optimizer
+    imageopti:
+      moduleName: github.com/agravelot/imageopti
       version: v0.1.0
 ```
 
@@ -46,7 +46,7 @@ http:
       entryPoints:
         - web
       middlewares:
-        - image_optimizer
+        - imageopti
 
   services:
    service-foo:
@@ -55,7 +55,7 @@ http:
           - url: http://127.0.0.1:5000
   
   middlewares:
-    image_optimizer:
+    imageopti:
       plugin:
         config:
           processor: <processor>

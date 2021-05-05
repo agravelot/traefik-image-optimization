@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/agravelot/image_optimizer/config"
+	"github.com/agravelot/imageopti/config"
 )
 
 type Cache interface {

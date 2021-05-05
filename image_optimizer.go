@@ -1,4 +1,4 @@
-package image_optimizer
+package imageopti
 
 import (
 	"bytes"
@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agravelot/image_optimizer/cache"
-	"github.com/agravelot/image_optimizer/config"
-	"github.com/agravelot/image_optimizer/processor"
+	"github.com/agravelot/imageopti/cache"
+	"github.com/agravelot/imageopti/config"
+	"github.com/agravelot/imageopti/processor"
 )
 
 // Config the plugin configuration.

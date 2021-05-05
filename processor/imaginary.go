@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/agravelot/image_optimizer/config"
+	"github.com/agravelot/imageopti/config"
 )
 
 type pipelineOperationParams struct {

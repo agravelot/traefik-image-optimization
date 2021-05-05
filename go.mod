@@ -1,3 +1,3 @@
-module github.com/agravelot/image_optimizer
+module github.com/agravelot/imageopti
 
 go 1.16

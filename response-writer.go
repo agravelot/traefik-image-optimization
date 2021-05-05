@@ -1,4 +1,4 @@
-package image_optimizer
+package imageopti
 
 import (
 	"bytes"
