@@ -22,11 +22,22 @@ func (c *MemoryCache) Get(key string) ([]byte, error) {
 	return v, nil
 }
 
-// TODO Implement exipire logic
-func (c *MemoryCache) Set(key string, v []byte, _ time.Duration) error {
+func (c *MemoryCache) Set(key string, v []byte, expiry time.Duration) error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	c.m[key] = v
+
+	time.AfterFunc(expiry, func() {
+		c.delete(key)
+	})
+
 	return nil
+}
+
+func (c *MemoryCache) delete(key string) {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	delete(c.m, key)
 }

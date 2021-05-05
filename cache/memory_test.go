@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestMemoryCache_Get(t *testing.T) {
@@ -92,7 +93,7 @@ func TestMemoryCache_Set(t *testing.T) {
 				mtx: sync.RWMutex{},
 				m:   tt.fields.m,
 			}
-			if err := c.Set(tt.args.key, tt.args.v, 0); (err != nil) != tt.wantErr {
+			if err := c.Set(tt.args.key, tt.args.v, 100*time.Millisecond); (err != nil) != tt.wantErr {
 				t.Errorf("MemoryCache.Set() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
@@ -103,6 +104,13 @@ func TestMemoryCache_Set(t *testing.T) {
 
 			if !bytes.Equal(v, tt.args.v) {
 				t.Errorf("result differ")
+			}
+
+			time.Sleep(1 * time.Second)
+
+			v, err = c.Get(tt.args.key)
+			if err == nil {
+				t.Errorf("value must be deleted after expiry")
 			}
 		})
 	}
@@ -159,5 +167,51 @@ func BenchmarkMemoryCache_SetNewKey(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		_ = c.Set(fmt.Sprintf("%s-%d", testCacheKey, i), []byte("a good media value"), 0)
+	}
+}
+
+func TestMemoryCache_delete(t *testing.T) {
+	type fields struct {
+		m map[string][]byte
+	}
+	type args struct {
+		key string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "should return not error when delete non existent cache",
+			fields:  fields{m: map[string][]byte{}},
+			args:    args{key: "/test.jpeg"},
+			wantErr: false,
+		},
+		{
+			name: "should be able to delete cache",
+			fields: fields{m: map[string][]byte{
+				"/test.jpeg": []byte("result"),
+			}},
+			args:    args{key: "/test.jpeg"},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &MemoryCache{
+				mtx: sync.RWMutex{},
+				m:   tt.fields.m,
+			}
+
+			c.delete(tt.args.key)
+
+			_, ok := c.m[tt.args.key]
+
+			if ok {
+				t.Errorf("MemoryCache.delete() key must be deleted : %v", tt.args.key)
+			}
+		})
 	}
 }
