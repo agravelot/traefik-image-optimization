@@ -1,6 +1,7 @@
 package image_optimizer
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -22,7 +23,15 @@ type Config struct {
 
 // CreateConfig creates the default plugin configuration.
 func CreateConfig() *Config {
-	return &Config{}
+	return &Config{
+		config.Config{
+			Processor: "",
+			Cache:     "",
+			Imaginary: config.ImaginaryProcessorConfig{Url: ""},
+			Redis:     config.RedisCacheConfig{Url: ""},
+			File:      config.FileCacheConfig{Path: ""},
+		},
+	}
 }
 
 // ImageOptimizer middleware plugin struct.
@@ -35,9 +44,7 @@ type ImageOptimizer struct {
 
 // New created a new ImageOptimizer plugin.
 func New(ctx context.Context, next http.Handler, conf *Config, name string) (http.Handler, error) {
-
 	log.Println("Loading image optimization plugin...")
-	fmt.Printf("config : %+v\n", conf)
 
 	if conf.Processor == "" {
 		return nil, fmt.Errorf("processor must be defined")
@@ -50,7 +57,6 @@ func New(ctx context.Context, next http.Handler, conf *Config, name string) (htt
 
 	p, err := processor.New(conf.Config)
 	if err != nil {
-		fmt.Println(err.Error())
 		panic(err)
 	}
 
@@ -63,12 +69,12 @@ func New(ctx context.Context, next http.Handler, conf *Config, name string) (htt
 }
 
 const (
-	contentLength    = "Content-Length"
-	contentType      = "Content-Type"
-	cacheStatus      = "Cache-Status"
-	cacheHitStatus   = "hit"
-	cacheMissStatus  = "miss"
-	cacheErrorStatus = "error"
+	contentLength   = "Content-Length"
+	contentType     = "Content-Type"
+	cacheStatus     = "Cache-Status"
+	cacheHitStatus  = "hit"
+	cacheMissStatus = "miss"
+	cacheExpiry     = 100 * time.Second
 )
 
 func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
@@ -86,15 +92,19 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		rw.Header().Set(contentLength, fmt.Sprint(len(v)))
 		rw.Header().Add(contentType, targetFormat)
 		_, err = rw.Write(v)
+
 		if err != nil {
 			panic(err)
 		}
+
 		return
 	}
 
 	wrappedWriter := &responseWriter{
 		ResponseWriter: rw,
 		bypassHeader:   true,
+		wroteHeader:    false,
+		buffer:         bytes.Buffer{},
 	}
 
 	a.next.ServeHTTP(wrappedWriter, req)
@@ -108,6 +118,7 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
+
 		return
 	}
 
@@ -130,7 +141,7 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	err = a.c.Set(key, optimized, 100*time.Second)
+	err = a.c.Set(key, optimized, cacheExpiry)
 	if err != nil {
 		panic(err)
 	}

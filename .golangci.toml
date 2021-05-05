@@ -36,6 +36,7 @@
     "testpackage",
     "paralleltest",
     "tparallel",
+    "scopelint",
   ]
 
 [issues]

@@ -14,7 +14,6 @@ type responseWriter struct {
 }
 
 func (r *responseWriter) WriteHeader(statusCode int) {
-
 	if !r.bypassHeader {
 		r.ResponseWriter.WriteHeader(statusCode)
 	}
@@ -24,6 +23,7 @@ func (r *responseWriter) Write(p []byte) (int, error) {
 	if !r.wroteHeader {
 		r.WriteHeader(http.StatusOK)
 	}
+
 	return r.buffer.Write(p)
 }
 
