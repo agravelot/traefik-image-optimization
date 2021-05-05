@@ -1,7 +1,7 @@
 displayName: Image optimizer
 type: middleware
 
-import: github.com/agravelot/image_optimizer
+import: github.com/agravelot/imageopti
 
 summary: 'Image optimizer middleware is a middleware designed to optimize image responses on the fly.'
 

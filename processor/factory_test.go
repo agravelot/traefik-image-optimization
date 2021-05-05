@@ -1,38 +1,55 @@
-package processor_test
+package processor
 
 import (
+	"net/http"
 	"reflect"
 	"testing"
+	"time"
 
-	"github.com/agravelot/image_optimizer/config"
-	"github.com/agravelot/image_optimizer/processor"
+	"github.com/agravelot/imageopti/config"
 )
+
+const defaultTimeout = 1 * time.Second
 
 func TestNew(t *testing.T) {
 	type args struct {
 		conf config.Config
 	}
+
 	tests := []struct {
 		name    string
 		args    args
-		want    processor.Processor
+		want    Processor
 		wantErr bool
 	}{
 		{
-			name:    "should be able to return imaginary optimizer",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "http://localhost"}}},
-			want:    &processor.ImaginaryProcessor{},
+			name: "should be able to return imaginary optimizer",
+			args: args{
+				config.Config{
+					Processor: "imaginary",
+					Imaginary: config.ImaginaryProcessorConfig{URL: "http://localhost"},
+					Cache:     "none",
+					Redis:     config.RedisCacheConfig{URL: ""},
+					File:      config.FileCacheConfig{Path: ""},
+				},
+			},
+			want:    &ImaginaryProcessor{"", http.Client{Timeout: defaultTimeout}},
 			wantErr: false,
 		},
 		{
 			name:    "should not be able to init imaginary without valid url",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "localhost"}}},
+			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{URL: "localhost"}}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
-			name:    "should not be able to init imaginary without valid url 2 ",
-			args:    args{config.Config{Processor: "imaginary", Imaginary: config.ImaginaryProcessorConfig{Url: "htt://localhost"}}},
+			name: "should not be able to init imaginary without valid url 2 ",
+			args: args{
+				config.Config{
+					Processor: "imaginary",
+					Imaginary: config.ImaginaryProcessorConfig{URL: "htt://localhost"},
+				},
+			},
 			want:    nil,
 			wantErr: true,
 		},
@@ -45,7 +62,7 @@ func TestNew(t *testing.T) {
 		{
 			name:    "should be able to return local optimizer",
 			args:    args{config.Config{Processor: "local"}},
-			want:    &processor.LocalProcessor{},
+			want:    &LocalProcessor{},
 			wantErr: false,
 		},
 		{
@@ -61,9 +78,10 @@ func TestNew(t *testing.T) {
 			wantErr: true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := processor.New(tt.args.conf)
+			got, err := New(tt.args.conf)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("New() error = %v, wantErr %v", err, tt.wantErr)
 			}
