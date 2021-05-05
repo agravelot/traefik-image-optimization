@@ -35,7 +35,6 @@ type ImaginaryProcessor struct {
 }
 
 func isValidUrl(s string) error {
-
 	if s == "" {
 		return fmt.Errorf("url cannot be empty")
 	}
@@ -53,7 +52,6 @@ func isValidUrl(s string) error {
 }
 
 func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
-
 	err := isValidUrl(conf.Imaginary.Url)
 	if err != nil {
 		return nil, err
@@ -66,7 +64,6 @@ func NewImaginary(conf config.Config) (*ImaginaryProcessor, error) {
 }
 
 func (ip *ImaginaryProcessor) Optimize(media []byte, originalFormat string, targetFormat string, quality, width int) ([]byte, string, error) {
-
 	ope := []pipelineOperation{
 		{Operation: "convert", Params: pipelineOperationParams{Type: "webp", StripMeta: true}},
 	}
@@ -101,7 +98,6 @@ func (ip *ImaginaryProcessor) Optimize(media []byte, originalFormat string, targ
 	}
 
 	req, err := http.NewRequest(method, u, payload)
-
 	if err != nil {
 		return nil, "", err
 	}

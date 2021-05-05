@@ -11,7 +11,6 @@ type Processor interface {
 }
 
 func New(conf config.Config) (Processor, error) {
-
 	if conf.Processor == "imaginary" {
 		p, err := NewImaginary(conf)
 		if err != nil {
