@@ -87,7 +87,11 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 	// Return cached result here.
 	if v, err := a.c.Get(key); err == nil {
-		err = writeResponse(rw, targetFormat, cacheHitStatus, v)
+		rw.Header().Set(contentLength, fmt.Sprint(len(v)))
+		rw.Header().Set(contentType, targetFormat)
+		rw.Header().Set(cacheStatus, cacheHitStatus)
+		_, err = rw.Write(v)
+
 		if err != nil {
 			panic(err)
 		}
@@ -127,7 +131,11 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	err = writeResponse(rw, ct, cacheMissStatus, optimized)
+	rw.Header().Set(contentLength, fmt.Sprint(len(optimized)))
+	rw.Header().Set(contentType, ct)
+	rw.Header().Set(cacheStatus, cacheMissStatus)
+
+	_, err = rw.Write(optimized)
 	if err != nil {
 		panic(err)
 	}
@@ -136,16 +144,6 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func writeResponse(rw http.ResponseWriter, ct, cs string, b []byte) error {
-	rw.Header().Set(contentLength, fmt.Sprint(len(b)))
-	rw.Header().Set(contentType, ct)
-	rw.Header().Set(cacheStatus, cs)
-
-	_, err := rw.Write(b)
-
-	return fmt.Errorf("unable to send response: %w", err)
 }
 
 func imageWidthRequest(req *http.Request) (int, error) {
