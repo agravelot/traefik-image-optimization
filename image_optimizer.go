@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -31,6 +33,7 @@ func CreateConfig() *Config {
 			Imaginary: config.ImaginaryProcessorConfig{URL: ""},
 			Redis:     config.RedisCacheConfig{URL: ""},
 			File:      config.FileCacheConfig{Path: ""},
+			Picture:   config.PictureProcessingConfig{Formats: make(map[string]config.PictureFormat)},
 		},
 	}
 }
@@ -41,6 +44,10 @@ type ImageOptimizer struct {
 	name string
 	p    processor.Processor
 	c    cache.Cache
+
+	formatRegExp        *regexp.Regexp
+	formatRegExpReplace string
+	formats             map[string]config.PictureFormat
 }
 
 // New created a new ImageOptimizer plugin.
@@ -66,6 +73,10 @@ func New(ctx context.Context, next http.Handler, conf *Config, name string) (htt
 		c:    c,
 		next: next,
 		name: name,
+
+		formatRegExp:        getFormatRegExp(conf.Picture.FormatRegExp),
+		formatRegExpReplace: conf.Picture.FormatRegExpReplace,
+		formats:             conf.Picture.Formats,
 	}, nil
 }
 
@@ -78,6 +89,30 @@ const (
 	cacheExpiry     = 100 * time.Second
 	targetFormat    = "image/webp"
 )
+
+func (a *ImageOptimizer) transformPath(req *http.Request) (width int) {
+	log.Println(req.URL.Path, a.formatRegExp.MatchString(req.URL.Path))
+	if a.formatRegExp == nil || !a.formatRegExp.MatchString(req.URL.Path) {
+		return 0
+	}
+	path := string(a.formatRegExp.ReplaceAllFunc([]byte(req.URL.Path), func(s []byte) []byte {
+		format := a.formatRegExp.ReplaceAllString(string(s), "$1")
+		width, _ = strconv.Atoi(format)
+		if width == 0 {
+			formatConfig := a.formats[format]
+			width = formatConfig.Width
+		}
+		return []byte(a.formatRegExpReplace)
+	}))
+
+	var err error
+	req.URL.Path, err = url.PathUnescape(path)
+	if err != nil {
+		panic(err)
+	}
+	req.RequestURI = req.URL.RequestURI()
+	return
+}
 
 func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// TODO Check if cacheable
@@ -106,6 +141,7 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		buffer:         bytes.Buffer{},
 	}
 
+	width := a.transformPath(req)
 	a.next.ServeHTTP(wrappedWriter, req)
 
 	wrappedWriter.bypassHeader = false
@@ -121,9 +157,11 @@ func (a *ImageOptimizer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	width, err := imageWidthRequest(req)
-	if err != nil {
-		panic(err)
+	if width == 0 {
+		width, err = imageWidthRequest(req)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	optimized, ct, err := a.p.Optimize(bodyBytes, rw.Header().Get(contentType), targetFormat, 75, width)
@@ -169,4 +207,16 @@ func imageWidthRequest(req *http.Request) (int, error) {
 // isImageResponse Determine with Content-Type header if the response is an image.
 func isImageResponse(rw http.ResponseWriter) bool {
 	return strings.HasPrefix(rw.Header().Get(contentType), "image/")
+}
+
+func getFormatRegExp(rx string) *regexp.Regexp {
+	if rx != "" {
+
+		rx, err := regexp.Compile(rx)
+		if err != nil {
+			panic(err)
+		}
+		return rx
+	}
+	return nil
 }
